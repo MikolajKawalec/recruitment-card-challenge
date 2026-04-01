@@ -2,22 +2,89 @@ extends defaults/layout.pug
 include defaults/mixins.pug
 block content
     .container
-        .card__preview
-            .card__preview--number XXXX XXXX XXXX XXXX
-            .card__preview--holder Jan Kowalski
-        form.card__form
-            input.card__form--input(type="text" placeholder="Card number")
-            label(for="card__form--select")
-            select#card__form--select
-                option 01
-                option 02
-                option 03
-                option 04
-                option 05
-                option 06
-                option 07
-                option 08
-                option 09
-                option 10
-                option 11
-                option 12
+        .card-wrapper
+            #card_preview.card__preview
+                .card__inner
+                    .card__front
+                        .card__top
+                            .card__chip
+                            .card__logo
+                                img(src="./images/visa.png" alt="Visa")
+                        #card_number_display.card__number #### #### #### ####
+                        .card__bottom
+                            .card__info
+                                .card__label Card Holder
+                                #card_name_display.card__value JAN KOWALSKI
+                            .card__info.card__info--expiration
+                                .card__label Expiries
+                                #card_expiration_display.card__value.card__expiration
+                                    span#card_expiration_month_display.card__expiration-part MM
+                                    span.card__expiration-slash /
+                                    span#card_expiration_year_display.card__expiration-part YY
+                    .card__back
+                        .card__black-line
+                        .card__cvv-section  
+                            .card__cvv-label CVV
+                            #card_cvv_display.card__cvv-value CVV
+                            .card__logo.card__logo--grey
+                                img(src="./images/visa.png" alt="Visa")
+            .card__form-container
+                form#form_card.card__form
+                    .form__group
+                        label.form__label(for="card_number") Card Number
+                        input#card_number.form__input(type="text" placeholder="Card number" name="card_number" inputmode="numeric" maxlength="19" pattern="[0-9]*" autocomplete="cc-number")
+                    .form__group
+                        label.form__label(for="card_name") Card Name
+                        input#card_name.form__input(
+                            type="text"
+                            placeholder="Card name"
+                            name="card_name"
+                            autocomplete="cc-name"
+                        )
+                    .form__row
+                        .form__group.form__group--main
+                            label.form__label Expiration Date
+                            .form__flex
+                                .form__select-wrapper
+                                    select#card_expiration_month.form__input(
+                                        name="card_expiration_month"
+                                        autocomplete="cc-exp-month"
+                                    )
+                                        option(value="" disabled selected) Month
+                                        option(value="01") 01
+                                        option(value="02") 02
+                                        option(value="03") 03
+                                        option(value="04") 04
+                                        option(value="05") 05
+                                        option(value="06") 06
+                                        option(value="07") 07
+                                        option(value="08") 08
+                                        option(value="09") 09
+                                        option(value="10") 10
+                                        option(value="11") 11
+                                        option(value="12") 12
+                                .form__select-wrapper
+                                    select#card_expiration_year.form__input(
+                                        name="card_expiration_year"
+                                        autocomplete="cc-exp-year"
+                                    )
+                                        option(value="" disabled selected) Year
+                                        option(value="2026") 2026
+                                        option(value="2027") 2027
+                                        option(value="2028") 2028
+                                        option(value="2029") 2029
+                                        option(value="2030") 2030
+                                        option(value="2031") 2031
+                        .form__group.form__group--cvv
+                            label.form__label(for="card_cvv") CVV
+                            input#card_cvv.form__input(
+                                type="text"
+                                placeholder="CVV"
+                                name="card_cvv"
+                                inputmode="numeric"
+                                maxlength="4"
+                                pattern="[0-9]*"
+                                autocomplete="cc-csc"
+                            )
+                    
+                    button.form__submit(type="submit") Submit

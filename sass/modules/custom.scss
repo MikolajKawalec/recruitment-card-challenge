@@ -1,0 +1,496 @@
+@use "sass:list";
+
+$color-body-bg: #86c4f7;
+$color-card-bg: #0a1128;
+$color-card-stripe: #000;
+$color-card-border: rgba(71, 85, 105, 0.5);
+$color-primary: #0052cc;
+$color-surface: #fff;
+$color-text: #f8f8f8;
+$color-text-dark: #000;
+$color-text-dim: rgba(255, 255, 255, 0.6);
+$color-input: #092d63;
+$color-input-focus: #3d9cff;
+$color-input-border: #ced6e0;
+
+$space: 1rem;
+$space-sm: 0.5rem;
+$space-lg: 1.5rem;
+
+$text-sm: 0.75rem;
+$text-base: 1rem;
+$text-lg: 1.75rem;
+
+$card-width: 25rem;
+$form-width: $card-width * 1.3;
+
+$duration: 0.2s;
+$duration-slow: 0.6s;
+
+$gradient-overlay: linear-gradient(rgba(0, 0, 0, 0.3), rgba(0, 0, 0, 0.3));
+
+@mixin transition($props...) {
+	$transitions: ();
+	@each $prop in $props {
+		$transitions: list.append($transitions, #{$prop} $duration ease, comma);
+	}
+	transition: $transitions;
+}
+
+html,
+body {
+	background-color: $color-body-bg;
+	height: 100%;
+	margin: 0;
+	font-family: "Source Sans 3", sans-serif;
+	color: $color-text;
+}
+
+.card-wrapper {
+	position: relative;
+	width: 100%;
+	max-width: $form-width;
+	margin: 8rem auto 2rem;
+	padding: 0 1rem;
+
+	#card_number_display,
+	.card__info {
+		border: 1px solid transparent;
+		border-radius: 0.375rem;
+		@include transition(border-color, background-color);
+	}
+
+	&:has(input[name="card_number"]:focus) #card_number_display,
+	&:has(input[name="card_name"]:focus) .card__info:has(#card_name_display),
+	&:has(select[name="card_expiration_month"]:focus)
+		.card__info:has(#card_expiration_display),
+	&:has(select[name="card_expiration_year"]:focus)
+		.card__info:has(#card_expiration_display) {
+		border-color: $color-text-dim;
+		background: transparent;
+	}
+
+	&:has(input[name="card_cvv"]:focus) .card__cvv-section {
+		border-color: $color-text-dim;
+		background: transparent;
+	}
+
+	&:has(input[name="card_cvv"]:focus) .card__inner {
+		transform: rotateY(180deg);
+	}
+}
+
+.card {
+	&__preview {
+		position: absolute;
+		top: -6rem;
+		left: 50%;
+		transform: translateX(-50%);
+		z-index: 10;
+
+		width: 100%;
+		max-width: $card-width;
+		aspect-ratio: 1.586;
+		perspective: 62.5rem;
+	}
+
+	&__inner {
+		position: relative;
+		width: 100%;
+		height: 100%;
+		transition: transform $duration-slow cubic-bezier(0.4, 0.2, 0.2, 1);
+		transform-style: preserve-3d;
+	}
+
+	&__front,
+	&__back {
+		position: absolute;
+		inset: 0;
+		border-radius: 1rem;
+		border: 1px solid $color-card-border;
+		box-shadow: 0 1.25rem 2.5rem -0.625rem rgba(0, 0, 0, 0.5);
+
+		background-color: $color-card-bg;
+
+		background-image: $gradient-overlay, url("../../images/background.jpg");
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+
+		backface-visibility: hidden;
+		-webkit-backface-visibility: hidden;
+
+		overflow: hidden;
+	}
+
+	&__front {
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
+		padding: 1.5rem;
+
+		transform: rotateY(0deg);
+		z-index: 2;
+	}
+
+	&__back {
+		transform: rotateY(180deg);
+	}
+
+	&__top {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		justify-content: space-between;
+		align-items: flex-start;
+	}
+
+	&__chip {
+		width: 4.375rem;
+		height: auto;
+		aspect-ratio: 1.33333;
+		border-radius: 0.375rem;
+		background-image: url("../../images/chip.png");
+		background-size: cover;
+		background-position: center;
+		background-repeat: no-repeat;
+	}
+
+	&__logo {
+		height: 2.5rem;
+		width: 100%;
+		display: flex;
+		justify-content: flex-end;
+
+		img {
+			height: 100%;
+			object-fit: contain;
+		}
+
+		&--changed img {
+			animation: top-down 0.35s ease both;
+		}
+
+		&--grey img {
+			filter: grayscale(100%) brightness(0.9) !important;
+			opacity: 0.7 !important;
+		}
+	}
+
+	&__number {
+		display: block;
+		width: 100%;
+		box-sizing: border-box;
+		padding: 0.5rem 0.75rem;
+		font-family: monospace;
+		font-size: $text-lg;
+		font-weight: 300;
+		border: 1px solid transparent;
+		border-radius: 0.375rem;
+		@include transition(border-color, background-color);
+	}
+
+	&__bottom {
+		position: relative;
+		z-index: 2;
+		display: flex;
+		align-items: flex-end;
+		gap: 0.75rem;
+		text-transform: uppercase;
+	}
+
+	&__info {
+		min-width: 0;
+		padding: $space-sm 0.625rem;
+		border: 1px solid transparent;
+		border-radius: 0.375rem;
+		box-sizing: border-box;
+		@include transition(border-color, background-color);
+
+		&:not(&--expiration) {
+			flex: 1 1 auto;
+		}
+	}
+
+	&__info--expiration {
+		flex: 0 0 auto;
+		margin-left: auto;
+		text-align: right;
+		padding: $space-sm;
+	}
+
+	&__label {
+		font-size: $text-sm;
+		color: $color-text-dim;
+		letter-spacing: 0.1em;
+		margin-bottom: 0.125rem;
+		text-transform: none;
+	}
+
+	&__value {
+		font-size: $text-base;
+		font-weight: 600;
+		letter-spacing: 0.1em;
+		text-transform: uppercase;
+	}
+
+	&__black-line {
+		background: $color-card-stripe;
+		height: 2.8125rem;
+		width: 100%;
+		margin-top: 1.5625rem;
+	}
+
+	&__cvv-section {
+		padding: $space-lg;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		gap: $space-sm;
+	}
+
+	&__cvv-label {
+		width: 100%;
+		text-align: right;
+		font-size: 0.625rem;
+		margin-bottom: 0.25rem;
+		letter-spacing: 0.1em;
+	}
+
+	&__cvv-value {
+		width: 100%;
+		background-color: $color-surface;
+		color: $color-text-dark;
+
+		border-radius: 0.375rem;
+		padding: $space-sm 0.75rem;
+
+		font-size: 0.875rem;
+		letter-spacing: 2px;
+		text-align: right;
+		margin-bottom: 0.625rem;
+	}
+
+	&__expiration {
+		display: inline-flex;
+		align-items: baseline;
+		gap: 0.15em;
+		white-space: nowrap;
+
+		&-part {
+			display: inline-block;
+			transform-origin: center bottom;
+			will-change: transform, opacity, filter;
+
+			&--changed {
+				animation: top-down 0.35s ease;
+				animation-fill-mode: both;
+			}
+		}
+
+		&-slash {
+			opacity: 0.75;
+		}
+	}
+}
+
+.card__form-container {
+	width: 100%;
+	max-width: $form-width;
+	margin: 0 auto;
+	background: $color-surface;
+	border-radius: 0.75rem;
+	padding: 12rem 2rem 2.5rem;
+	box-shadow: 0 1.875rem 3.75rem 0 rgba(90, 116, 148, 0.15);
+	box-sizing: border-box;
+}
+
+.card__form {
+	display: flex;
+	flex-direction: column;
+	gap: $space-lg;
+}
+
+.form {
+	&__group {
+		display: flex;
+		flex-direction: column;
+		gap: 8px;
+
+		&--main {
+			flex: 1;
+		}
+		&--cvv {
+			width: 6.25rem;
+		}
+	}
+
+	&__label {
+		font-size: 0.8125rem;
+		font-weight: 500;
+
+		color: $color-input;
+		margin-bottom: 0.125rem;
+	}
+
+	&__input {
+		width: 100%;
+		padding: 0.75rem $space;
+		border: 1px solid $color-input-border;
+		border-radius: 0.375rem;
+		font-size: $text-base;
+		color: $color-input;
+		background: $color-surface;
+		transition:
+			border-color 0.3s ease-in-out,
+			box-shadow 0.3s ease-in-out;
+		box-sizing: border-box;
+		font-family: inherit;
+
+		&:focus {
+			outline: none;
+			border-color: $color-input-focus;
+			box-shadow: 0 0.625rem 1.25rem -0.8125rem rgba(32, 56, 117, 0.35);
+		}
+	}
+
+	&__row {
+		display: flex;
+		gap: $space-lg;
+	}
+
+	&__flex {
+		display: flex;
+		gap: $space;
+	}
+
+	&__select-wrapper {
+		flex: 1;
+		position: relative;
+
+		select.form__input {
+			appearance: none;
+			-webkit-appearance: none;
+			cursor: pointer;
+			padding-right: 1.875rem;
+		}
+
+		&::after {
+			content: "";
+			position: absolute;
+			top: 50%;
+			right: 0.625rem;
+			transform: translateY(-50%);
+			border-left: 0.375rem solid transparent;
+			border-right: 0.375rem solid transparent;
+			border-top: 0.375rem solid $color-input;
+			pointer-events: none;
+
+			transition: transform $duration ease;
+		}
+
+		&:focus-within::after {
+			transform: translateY(-50%) rotate(180deg);
+		}
+	}
+
+	&__submit {
+		display: block;
+		width: 100%;
+		margin-top: $space;
+		background: $color-primary;
+		color: $color-text;
+		padding: 0.75rem;
+		border: none;
+		border-radius: 0.5rem;
+		font-size: 1.125rem;
+		font-weight: 600;
+		cursor: pointer;
+		transition:
+			transform $duration ease,
+			box-shadow $duration ease;
+		box-shadow: 0 0.625rem 1.25rem -0.3125rem rgba(35, 100, 210, 0.4);
+
+		&:hover {
+			transform: translateY(-2px);
+			box-shadow: 0 0.75rem 1.5625rem -0.3125rem rgba(35, 100, 210, 0.5);
+		}
+
+		&:active {
+			transform: translateY(0);
+		}
+	}
+}
+
+@keyframes top-down {
+	0% {
+		transform: translateY(-0.75rem);
+		opacity: 0;
+		filter: blur(2px);
+	}
+	25% {
+		transform: translateY(-0.375rem);
+		opacity: 0.5;
+	}
+	50% {
+		transform: translateY(0);
+		opacity: 1;
+	}
+	75% {
+		transform: translateY(0.25rem);
+		opacity: 1;
+	}
+	100% {
+		transform: translateY(0);
+		opacity: 1;
+		filter: blur(0);
+	}
+}
+
+@keyframes wiggle {
+	0% {
+		transform: rotate(40deg);
+		opacity: 0;
+		filter: blur(2px);
+	}
+	25% {
+		transform: rotate(30deg);
+		opacity: 0.5;
+	}
+	50% {
+		transform: rotate(20deg);
+		opacity: 1;
+	}
+	75% {
+		transform: rotate(10deg);
+		opacity: 1;
+	}
+	100% {
+		transform: rotate(0deg);
+		opacity: 1;
+		filter: blur(0);
+	}
+}
+
+.char {
+	display: inline-block;
+	vertical-align: baseline;
+	transform-origin: center bottom;
+}
+
+.char--changed-number {
+	animation: top-down 0.35s ease both;
+}
+
+.char--changed-name {
+	animation: wiggle 0.35s ease both;
+}
+
+.card__info:not(.card__info--expiration) .card__value {
+	display: block;
+	max-width: 100%;
+	overflow: hidden;
+	text-overflow: ellipsis;
+	white-space: nowrap;
+}
